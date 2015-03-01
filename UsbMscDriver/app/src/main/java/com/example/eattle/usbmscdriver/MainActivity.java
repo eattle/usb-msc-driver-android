@@ -1,7 +1,7 @@
 package com.example.eattle.usbmscdriver;
 
 import android.app.Activity;
-import android.hardware.usb.UsbDevice;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,11 +9,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.eattle.devicehost.device.BlockDevice;
 import com.example.eattle.devicehost.host.BlockDeviceApp;
@@ -54,8 +56,16 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onConnected(BlockDevice blockDevice) {
                 byte[] buffer = new byte[(int) blockDevice.getBlockLength()];
+                Toast toast = null;
+                String detail = null;
                 blockDevice.readBlock(0, buffer);
-                Log.i("MBR MAGIC 1", Integer.toHexString(buffer[510] & 0xFF) + Integer.toHexString(buffer[511] & 0xFF));
+
+                detail = Integer.toHexString(buffer[510] & 0xFF) + Integer.toHexString(buffer[511] & 0xFF);
+                Log.i("MBR MAGIC 1", detail);
+
+                toast = Toast.makeText(getApplicationContext(), "MBR MAGIC 1 " + detail, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
 
                 buffer[510] = 0x54;
                 buffer[511] = (byte) 0xBB;
@@ -63,7 +73,11 @@ public class MainActivity extends ActionBarActivity
 
                 buffer = new byte[(int) blockDevice.getBlockLength()];
                 blockDevice.readBlock(0, buffer);
-                Log.i("MBR MAGIC 2", Integer.toHexString(buffer[510] & 0xFF) + Integer.toHexString(buffer[511] & 0xFF));
+                detail = Integer.toHexString(buffer[510] & 0xFF) + Integer.toHexString(buffer[511] & 0xFF);
+                Log.i("MBR MAGIC 2", detail);
+                toast = Toast.makeText(getApplicationContext(), "MBR MAGIC 2 " + detail, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
 
                 buffer[510] = 0x55;
                 buffer[511] = (byte) 0xAA;
@@ -71,7 +85,11 @@ public class MainActivity extends ActionBarActivity
 
                 buffer = new byte[(int) blockDevice.getBlockLength()];
                 blockDevice.readBlock(0, buffer);
-                Log.i("MBR MAGIC 3", Integer.toHexString(buffer[510] & 0xFF) + Integer.toHexString(buffer[511] & 0xFF));
+                detail = Integer.toHexString(buffer[510] & 0xFF) + Integer.toHexString(buffer[511] & 0xFF);
+                Log.i("MBR MAGIC 3", detail);
+                toast = Toast.makeText(getApplicationContext(), "MBR MAGIC 3 " + detail, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
         });
     }
