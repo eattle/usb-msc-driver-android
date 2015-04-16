@@ -31,19 +31,15 @@ public class MyUsbSerialDevice implements UsbSerialDevice {
 
     @Override
     public void read(byte[] data) {
-        byte[] buffer = new byte[BUFFER_LENGTH];
-        int response = connection.bulkTransfer(readEndpoint, buffer, buffer.length, TIMEOUT);
+        assert data.length == BUFFER_LENGTH;
+        int response = connection.bulkTransfer(readEndpoint, data, data.length, TIMEOUT);
         if (response > 0) {
-            byte[] receivedData = new byte[response];
-            System.arraycopy(buffer, 0, receivedData, 0, response);
-            int cswSignature = 0;
             if (response == CBS_SIZE) {
-                cswSignature = swapEndianness(ByteBuffer.wrap(Arrays.copyOfRange(receivedData, 0, 4)).getInt());
+                int cswSignature = swapEndianness(ByteBuffer.wrap(Arrays.copyOfRange(data, 0, 4)).getInt());
+                if (cswSignature == CBS_SIGNATURE) {
+                    return;
+                }
             }
-            if (receivedData.length == CBS_SIZE && cswSignature == CBS_SIGNATURE) {
-                return;
-            }
-            System.arraycopy(receivedData, 0, data, 0, response);
         }
     }
 
