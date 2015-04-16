@@ -66,6 +66,32 @@ public class MainActivity extends ActionBarActivity
         showToast("MBR MAGIC 3 " + Integer.toHexString(buffer[510] & 0xFF) + Integer.toHexString(buffer[511] & 0xFF));
     }
 
+    private void testThroughput(BlockDevice blockDevice) {
+
+        final int BLOCKS = 2048;
+
+        byte[][] buffer = new byte[BLOCKS][(int) blockDevice.getBlockLength()];
+
+        long beginRead = System.currentTimeMillis();
+        for (int i = 0; i < BLOCKS; i++) {
+            blockDevice.readBlock(i, buffer[i]);
+        }
+        long endRead = System.currentTimeMillis();
+        long beginWrite = System.currentTimeMillis();
+        for (int i = 0; i < BLOCKS; i++) {
+            blockDevice.writeBlock(i, buffer[i]);
+        }
+        long endWrite = System.currentTimeMillis();
+
+        long timeRead = endRead - beginRead;
+        long timeWrite = endWrite - beginWrite;
+
+        showToast("timeRead: " + String.valueOf(timeRead));
+        showToast("timeWrite: " + String.valueOf(timeWrite));
+        showToast("throughputRead: " + String.valueOf(BLOCKS * blockDevice.getBlockLength() * 8 / (timeRead / 1000.0) / 1024.0) + " kbps");
+        showToast("throughputWrite: " + String.valueOf(BLOCKS * blockDevice.getBlockLength() * 8 / (timeWrite / 1000.0) / 1024.0) + " kbps");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +111,7 @@ public class MainActivity extends ActionBarActivity
             @Override
             public void onConnected(BlockDevice blockDevice) {
                 testMasterBootRecordMagic(blockDevice);
+                testThroughput(blockDevice);
             }
         });
     }
