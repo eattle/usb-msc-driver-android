@@ -31,10 +31,7 @@ public class UsbMassStorageBlockDevice implements BlockDevice {
         Read10ScsiCommand command = new Read10ScsiCommand();
         command.setLba(lba);
         usbSerialDevice.write(command.generateCommand());
-        byte[] readBuffer = new byte[512];
-        usbSerialDevice.read(readBuffer);
-        System.arraycopy(readBuffer, 0, buffer, 0, 512);
-
+        usbSerialDevice.read(buffer);
         byte[] csw = new byte[512];
         usbSerialDevice.read(csw);
     }
