@@ -12,26 +12,23 @@ public class Read10ScsiCommand implements ScsiCommand {
     @Override
     public byte[] generateCommand() {
 
+        Random random = new Random();
+        byte[] tag = new byte[4];
+        random.nextBytes(tag);
+
         byte[] buffer = new byte[]{
-                0x55, 0x53, 0x42, 0x43, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
+                0x55, 0x53, 0x42, 0x43, tag[0], tag[1], tag[2], tag[3], 0x00, 0x02,
                 0x00, 0x00, (byte) 0x80, 0x00, 0x0A, 0x28, 0x00, 0x00, 0x00, 0x00,
                 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x00
         };
-        Random random = new Random();
-        byte[] randomBuffer = new byte[4];
-        random.nextBytes(randomBuffer);
-        for (int i = 4; i <= 7; i++) {
-            buffer[i] = randomBuffer[i - 4];
-        }
 
-        int base = 17;
-        int lbaV = getLba();
-        for (int i = 0; i < 4; i++) {
-            int position = base + (3 - i);
-            buffer[position] = (byte) (lbaV & 0xFF);
-            lbaV = (lbaV & 0xFFFFFF00) >> 8;
-        }
+        final int lbaValue = getLba();
+        buffer[20] = (byte) (lbaValue & 0xFF);
+        buffer[19] = (byte) (((lbaValue & 0xFF00) >> 8) & 0xFF);
+        buffer[18] = (byte) (((lbaValue & 0xFF0000) >> 16) & 0xFF);
+        buffer[17] = (byte) (((lbaValue & 0xFF000000) >> 24) & 0xFF);
+
         return buffer;
     }
 
