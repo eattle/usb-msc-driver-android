@@ -40,6 +40,9 @@ public class CachedUsbMassStorageBlockDeviceTest extends TestCase {
         cachedUsbMassStorageBlockDevice.readBlock(0, buffer);
         assertEquals(5, mockBlockDevice.getReadCount());
         assertEquals(0, mockBlockDevice.getWriteCount());
+        cachedUsbMassStorageBlockDevice.flush();
+        assertEquals(5, mockBlockDevice.getReadCount());
+        assertEquals(0, mockBlockDevice.getWriteCount());
     }
 
     public void testReadBlockBig() throws Exception {
@@ -87,6 +90,8 @@ public class CachedUsbMassStorageBlockDeviceTest extends TestCase {
         cachedUsbMassStorageBlockDevice.writeBlock(2, buffer);
         cachedUsbMassStorageBlockDevice.writeBlock(1, buffer);
         cachedUsbMassStorageBlockDevice.writeBlock(0, buffer);
+        assertEquals(5, mockBlockDevice.getWriteCount());
+        assertEquals(0, mockBlockDevice.getReadCount());
         cachedUsbMassStorageBlockDevice.flush();
         assertEquals(10, mockBlockDevice.getWriteCount());
         assertEquals(0, mockBlockDevice.getReadCount());
